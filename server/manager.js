@@ -1,5 +1,8 @@
 const PWM = require("./PWM");
 
+/**
+ * control pwm signal and get fan rpm data
+ */
 class Manager {
   constructor() {
     this.pwm = new PWM(12);

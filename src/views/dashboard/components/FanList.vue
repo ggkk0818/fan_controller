@@ -41,7 +41,7 @@ export default class FanList extends Vue {
       let t = new TimelineMax({ repeat: -1 });
       t.fromTo(
         item,
-        1,
+        2,
         { rotation: 0 },
         { rotation: 360, ease: Power0.easeInOut }
       );
@@ -61,7 +61,7 @@ export default class FanList extends Vue {
           let scale = getTimeScale(item.load);
           let oldScale = vm.animateHolder.fromScale[index];
           let current = oldScale + (scale - oldScale) * this.ratio;
-          console.log(current);
+          console.log(this.ratio);
           vm.timeline[index].timeScale(current);
         });
       }
