@@ -2,7 +2,9 @@
   <div class="fan-list">
     <div class="fan" v-for="item of fanList" :key="item.id">
       <img ref="fan" :src="fanImg" />
-      <p class="text text-muted">{{ item.load * 100 }}%</p>
+      <p class="text text-muted">
+        {{ item.rpm }}rpm<br />{{ item.load | toPercent }}%
+      </p>
     </div>
   </div>
 </template>
@@ -19,9 +21,16 @@ declare type AnimateHolder = {
   fromScale: number[];
 };
 
-@Component
+@Component({
+  filters: {
+    toPercent(val: number): string {
+      return (val * 100).toFixed(0);
+    }
+  }
+})
 export default class FanList extends Vue {
   @Prop() private fanList!: Fan[];
+  lastFanList: Fan[] = [];
   fanImg: any = fanImg;
   timeline: TimelineMax[] = [];
   animateHolder: AnimateHolder = { percent: 0, fromScale: [] };
@@ -61,21 +70,20 @@ export default class FanList extends Vue {
           let scale = getTimeScale(item.load);
           let oldScale = vm.animateHolder.fromScale[index];
           let current = oldScale + (scale - oldScale) * this.ratio;
-          console.log(this.ratio);
           vm.timeline[index].timeScale(current);
         });
       }
     });
   }
   @Watch("fanList", { deep: true })
-  onFanListChanged(val: Fan[], old: Fan[]) {
+  onFanListChanged(val: Fan[]) {
     let isFanChanged = false;
-    if (val.length !== old.length) {
+    if (val.length !== this.lastFanList.length) {
       isFanChanged = true;
     } else {
       let index = val.length;
       while (index-- && !isFanChanged) {
-        if (val[index] !== old[index]) {
+        if (val[index] !== this.lastFanList[index]) {
           isFanChanged = true;
         }
       }
@@ -85,14 +93,16 @@ export default class FanList extends Vue {
     } else {
       this.updateAnimation();
     }
+    this.lastFanList = Array.from(val);
   }
 }
 </script>
 
 <style scoped lang="scss">
 .fan-list {
-  width: 100%;
   display: flex;
+  width: 100%;
+  margin-bottom: 50px;
   align-items: flex-start;
   flex-direction: row;
   flex-flow: wrap;

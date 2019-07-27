@@ -1,16 +1,17 @@
 <template>
   <div class="home">
     <fan-list :fanList="fanList" />
-    <slidebar v-model="speed" />
+    <slidebar v-model="speed" @input="setSpeed" />
   </div>
 </template>
 
 <script lang="ts">
+import _ from "lodash";
 import { Component, Vue, Watch } from "vue-property-decorator";
 import FanList from "./components/FanList.vue";
 import Slidebar from "./components/Slidebar.vue";
 import Fan from "@/model/Fan";
-
+import fanService, { SocketData } from "@/services/fanService";
 @Component({
   components: {
     FanList,
@@ -18,25 +19,85 @@ import Fan from "@/model/Fan";
   }
 })
 export default class Home extends Vue {
-  fanList: Fan[] = [];
-  speed: number = 0;
+  private fanList: Fan[] = [];
+  private speed: number = 0;
+  private setSpeedLoading = false;
+  private setSpeedTemp: number | null = null;
   created() {
-    this.fanList.push({
-      id: 1,
-      name: "Fan1",
-      load: 0,
-      rpm: 0
-    });
-    setTimeout(() => {
-      this.fanList[0].load = 1;
-      this.speed = 1;
-    }, 3000);
+    // this.fanList.push({
+    //   id: 1,
+    //   name: "Fan1",
+    //   load: 0,
+    //   rpm: 0
+    // });
+    // this.fanList.push({
+    //   id: 2,
+    //   name: "Fan2",
+    //   load: 0,
+    //   rpm: 0
+    // });
+    fanService.on("update", this.onStateUpdate);
+    this.connect();
   }
   @Watch("speed")
   onSpeedChange(val: number) {
     this.fanList.forEach(item => {
       item.load = val;
     });
+  }
+  onStateUpdate(data: SocketData) {
+    console.log(data);
+    if (data.fanList) {
+      this.updateFanList(data.fanList);
+    }
+    if (typeof data.speed === "number") {
+      this.updateSpeed(data.speed);
+    }
+  }
+  connect() {
+    fanService.connect();
+  }
+  setSpeed(val: number): Promise<any> {
+    if (this.setSpeedLoading) {
+      this.setSpeedTemp = val;
+      return Promise.resolve();
+    }
+    this.setSpeedLoading = true;
+    return fanService
+      .setSpeed(val)
+      .finally(() => {
+        this.setSpeedLoading = false;
+      })
+      .then(() => {
+        if (this.setSpeedTemp !== null) {
+          const temp = this.setSpeedTemp;
+          this.setSpeedTemp = null;
+          return this.setSpeed(temp);
+        }
+      });
+  }
+  updateSpeed(speed: number) {
+    this.speed = speed;
+  }
+  updateFanList(list: Fan[]) {
+    if (this.fanList.length) {
+      let i = this.fanList.length;
+      while (--i >= 0) {
+        if (!_.find(list, { id: this.fanList[i].id })) {
+          this.fanList.splice(i, 1);
+        }
+      }
+    }
+    if (list && list.length) {
+      list.forEach(item => {
+        let fan = _.find(this.fanList, { id: item.id });
+        if (!fan) {
+          fan = item;
+          this.fanList.push(item);
+        }
+        Object.assign(fan, item);
+      });
+    }
   }
 }
 </script>

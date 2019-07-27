@@ -51,7 +51,7 @@ class RPM extends EventEmitter {
     let n = Math.floor(1000 / TIMER_INTERVAL);
     for (let i = 0; i < n; i++) {
       if (this.data.length - 1 - i >= 0) {
-        rpm += this.data[this.data.length - 1 - n];
+        rpm += this.data[this.data.length - 1 - i];
       } else {
         break;
       }
@@ -61,12 +61,12 @@ class RPM extends EventEmitter {
         this.data[this.data.length - 1 - n] * ((1000 % TIMER_INTERVAL) / 1000)
       );
     }
-    if (rpm !== this.rpm) {
-      process.nextTick(() => {
-        this.$emit("update", rpm);
-      });
-    }
+    rpm *= 30;
+    const lastRPM = this.rpm;
     this.rpm = rpm;
+    if (rpm !== lastRPM) {
+      this.emit("update", rpm);
+    }
   }
 }
 module.exports = RPM;

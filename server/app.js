@@ -3,10 +3,12 @@ const express = require("express");
 const createError = require("http-errors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const app = express();
-const expressWs = require("express-ws")(app);
+const expressWs = require("express-ws");
 const speedRouter = require("./routes/speed");
 const stateRouter = require("./routes/state");
+const app = express();
+const wsInstance = expressWs(app);
+stateRouter.wsInstance = wsInstance;
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded

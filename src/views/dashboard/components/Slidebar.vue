@@ -7,6 +7,7 @@
       :dot-size="48"
       :max="1"
       :interval="0.01"
+      :tooltip-formatter="tooltipFormatter"
       v-model="percent"
     ></vue-slider>
   </div>
@@ -28,6 +29,9 @@ export default class Slidebar extends Vue {
   }
   set percent(val: number) {
     this.$emit("input", val);
+  }
+  tooltipFormatter(val: number): string {
+    return (val * 100).toFixed(0) + "%";
   }
 }
 </script>
