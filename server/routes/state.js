@@ -7,6 +7,7 @@ const manager = require("../manager");
  * receive fan control command and pc temperature data
  */
 router.ws("/state", function(ws, req) {
+  manager.updateHost(req); // add host
   ws.on("message", msg => {
     let data = null;
     try {
@@ -33,7 +34,9 @@ router.ws("/state", function(ws, req) {
         break;
     }
   });
-  ws.on("close", () => {});
+  ws.on("close", () => {
+    manager.updateHost(req);
+  });
 });
 /**
  * send fan state to all clients every second
@@ -51,7 +54,16 @@ setInterval(() => {
             load: manager.getSpeed(),
             rpm: item.rpm
           };
-        })
+        }),
+        hostList: manager.hostList.map(item => ({
+          id: item.id,
+          name: item.name,
+          ip: item.ip,
+          cmdList: item.cmdList,
+          hostData: item.hostData,
+          avgData: item.avgData,
+          state: item.state
+        }))
       })
     );
   });

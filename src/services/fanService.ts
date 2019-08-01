@@ -33,17 +33,25 @@ class FanService extends EventEmitter {
       return this.axios.post("/speed", { speed: percent });
     }
   }
-  connect() {
-    if (this.socket && (this.socket.readyState === WebSocket.OPEN ||  this.socket.readyState === WebSocket.CONNECTING)) {
-      return;
+  connect(): Promise<any> {
+    if (
+      this.socket &&
+      (this.socket.readyState === WebSocket.OPEN ||
+        this.socket.readyState === WebSocket.CONNECTING)
+    ) {
+      return Promise.resolve();
     }
-    this.socket = new WebSocket(`ws://${location.host}/api/state`);
-    this.socket.onmessage = e => this.onSocketMessage(e);
-    this.socket.onopen = e => {
-    };
-    this.socket.onerror = e => {
-      this.emit("error", e);
-    };
+    return new Promise((resolve, reject) => {
+      this.socket = new WebSocket(`ws://${location.host}/api/state`);
+      this.socket.onmessage = e => this.onSocketMessage(e);
+      this.socket.onopen = e => {
+        resolve(this.socket);
+      };
+      this.socket.onerror = e => {
+        reject(e);
+        this.emit("error", e);
+      };
+    });
   }
   private onSocketMessage(e: MessageEvent) {
     try {

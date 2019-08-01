@@ -4,10 +4,10 @@ const createError = require("http-errors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const expressWs = require("express-ws");
-const speedRouter = require("./routes/speed");
-const stateRouter = require("./routes/state");
 const app = express();
 const wsInstance = expressWs(app);
+const speedRouter = require("./routes/speed");
+const stateRouter = require("./routes/state");
 stateRouter.wsInstance = wsInstance;
 
 app.use(bodyParser.json()); // for parsing application/json

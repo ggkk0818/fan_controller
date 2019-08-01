@@ -24,18 +24,6 @@ export default class Home extends Vue {
   private setSpeedLoading = false;
   private setSpeedTemp: number | null = null;
   created() {
-    // this.fanList.push({
-    //   id: 1,
-    //   name: "Fan1",
-    //   load: 0,
-    //   rpm: 0
-    // });
-    // this.fanList.push({
-    //   id: 2,
-    //   name: "Fan2",
-    //   load: 0,
-    //   rpm: 0
-    // });
     fanService.on("update", this.onStateUpdate);
     this.connect();
   }
@@ -46,7 +34,6 @@ export default class Home extends Vue {
     });
   }
   onStateUpdate(data: SocketData) {
-    console.log(data);
     if (data.fanList) {
       this.updateFanList(data.fanList);
     }

@@ -4,19 +4,18 @@ const MAX_DUTY = 1000000;
 
 class PWM {
   constructor(pin) {
-    this.pin = pin;
-    this.percent = 0;
-    this.gpio = new Gpio(pin, { mode: Gpio.OUTPUT });
-    this.gpio.hardwarePwmWrite(FREQUENCY, 0);
-    this.setPercent(0.2);
+    this._pin = pin;
+    this._percent = 0;
+    this._gpio = new Gpio(pin, { mode: Gpio.OUTPUT });
+    this._gpio.hardwarePwmWrite(FREQUENCY, 0);
   }
   get percent() {
-    return this.percent;
+    return this._percent;
   }
   set percent(p) {
-    this.gpio.hardwarePwmWrite(FREQUENCY, Math.floor(MAX_DUTY * p));
-    this.percent = p;
-    console.log(`pin${this.pin} set pwm ${p * 100}%`);
+    this._gpio.hardwarePwmWrite(FREQUENCY, Math.floor(MAX_DUTY * p));
+    this._percent = p;
+    console.log(`pin${this._pin} set pwm ${p * 100}%`);
   }
 }
 module.exports = PWM;

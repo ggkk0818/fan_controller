@@ -6,4 +6,4 @@ reader.on("update", val => {
 });
 
 let pwm = new PWM(18);
-pwm.setPercent(1);
+pwm.percent = 1;
