@@ -3,7 +3,7 @@ const Gpio = require("pigpio").Gpio;
 const TIMER_INTERVAL = 200;
 const MAX_DATA_LENGTH = 600 * 5;
 
-class RPM extends EventEmitter {
+class RPMReader extends EventEmitter {
   constructor(pin) {
     super();
     this.pin = pin;
@@ -69,4 +69,4 @@ class RPM extends EventEmitter {
     }
   }
 }
-module.exports = RPM;
+module.exports = RPMReader;

@@ -1,14 +1,13 @@
 const express = require("express");
 const expressWs = require("express-ws");
 const router = express.Router();
+const HOST_COMMAND = require("../consts/hostCommand");
 const manager = require("../manager");
-const wsInstance = expressWs(router);
 /**
  * receive fan control command and pc temperature data
  */
 router.ws("/state", function(ws, req) {
   ws.on("message", msg => {
-    //TODO receive pc state
     let data = null;
     try {
       data = JSON.parse(msg);
@@ -19,16 +18,18 @@ router.ws("/state", function(ws, req) {
       return;
     }
     switch (data.type) {
-      case "state":
-        manager.setState(data);
+      case HOST_COMMAND.STATE:
+        manager.updateHost(req, data.type, data);
         break;
-      case "speed":
+      case HOST_COMMAND.SPEED:
         if (data.speed >= 0 && data.speed <= 1) {
           manager.setSpeed(data.speed);
         }
+        manager.updateHost(req, data.type);
         break;
       default:
         console.debug("unknown command", msg);
+        manager.updateHost(req, HOST_COMMAND.UNKNOWN);
         break;
     }
   });
@@ -43,12 +44,12 @@ setInterval(() => {
       JSON.stringify({
         type: "state",
         speed: manager.getSpeed(),
-        fanList: manager.getRpm().map((item, index) => {
+        fanList: manager.getFanList().map((item, index) => {
           return {
-            id: index,
-            name: `Fan${index}`,
+            id: item.id,
+            name: item.name,
             load: manager.getSpeed(),
-            rpm: item
+            rpm: item.rpm
           };
         })
       })

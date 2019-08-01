@@ -1,7 +1,7 @@
-const RPM = require("./RPM");
-const PWM = require("./PWM");
-let rpm = new RPM(27);
-rpm.on("update", val => {
+const RPMReader = require("./model/RPMReader");
+const PWM = require("./model/PWM");
+let reader = new RPMReader(27);
+reader.on("update", val => {
   console.log("rpm", val);
 });
 

@@ -10,10 +10,10 @@ class PWM {
     this.gpio.hardwarePwmWrite(FREQUENCY, 0);
     this.setPercent(0.2);
   }
-  getPercent() {
+  get percent() {
     return this.percent;
   }
-  setPercent(p) {
+  set percent(p) {
     this.gpio.hardwarePwmWrite(FREQUENCY, Math.floor(MAX_DUTY * p));
     this.percent = p;
     console.log(`pin${this.pin} set pwm ${p * 100}%`);
