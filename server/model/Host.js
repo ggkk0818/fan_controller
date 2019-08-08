@@ -18,6 +18,7 @@ class Host extends EventEmitter {
     this._endTime = null;
     this._lastCommandTime = null;
     this._isConnected = false;
+    this._ws = null;
     this._isDirty = false;
   }
 
@@ -60,6 +61,13 @@ class Host extends EventEmitter {
   }
   set isConnected(val) {
     this._isConnected = val;
+  }
+
+  get ws() {
+    return this._ws;
+  }
+  set ws(val) {
+    this._ws = val;
   }
 
   get state() {

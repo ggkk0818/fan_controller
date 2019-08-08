@@ -28,6 +28,10 @@ router.ws("/state", function(ws, req) {
         }
         manager.updateHost(req, data.type);
         break;
+      case HOST_COMMAND.MODE:
+        manager.setMode(data.mode);
+        manager.updateHost(req, data.type);
+        break;
       default:
         console.debug("unknown command", msg);
         manager.updateHost(req, HOST_COMMAND.UNKNOWN);
@@ -43,15 +47,17 @@ router.ws("/state", function(ws, req) {
  */
 setInterval(() => {
   router.wsInstance.getWss("/api/state").clients.forEach(ws => {
+    let host = manager.getHostByWs(ws);
     ws.send(
       JSON.stringify({
         type: "state",
+        mode: manager.getMode(),
         speed: manager.getSpeed(),
         fanList: manager.getFanList().map((item, index) => {
           return {
             id: item.id,
             name: item.name,
-            load: manager.getSpeed(),
+            load: item.load,
             rpm: item.rpm
           };
         }),
@@ -62,7 +68,8 @@ setInterval(() => {
           cmdList: item.cmdList,
           hostData: item.hostData,
           avgData: item.avgData,
-          state: item.state
+          state: item.state,
+          isCurrent: item === host
         }))
       })
     );
@@ -72,11 +79,21 @@ setInterval(() => {
  * broadcasts when speed changed
  */
 manager.on("update_speed", speed => {
-  router.wsInstance.getWss().clients.forEach(ws => {
+  router.wsInstance.getWss("/api/state").clients.forEach(ws => {
     ws.send(
       JSON.stringify({
         type: "speed",
         speed
+      })
+    );
+  });
+});
+manager.on("update_mode", mode => {
+  router.wsInstance.getWss("/api/state").clients.forEach(ws => {
+    ws.send(
+      JSON.stringify({
+        type: "mode",
+        mode
       })
     );
   });

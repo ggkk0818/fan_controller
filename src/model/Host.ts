@@ -18,6 +18,7 @@ declare namespace Host {
     hostData?: HostData;
     avgData?: HostData;
     state?: HostState;
+    isCurrent?: boolean;
   }
 }
 export default Host.Host;

@@ -1,6 +1,7 @@
 <template>
   <div class="home">
     <fan-list :fanList="fanList" />
+    <mode-switch v-model="controlMode" @input="setMode" />
     <slidebar v-model="speed" @input="setSpeed" />
   </div>
 </template>
@@ -10,19 +11,33 @@ import _ from "lodash";
 import { Component, Vue, Watch } from "vue-property-decorator";
 import FanList from "./components/FanList.vue";
 import Slidebar from "./components/Slidebar.vue";
+import ModeSwitch from "./components/ModeSwitch.vue";
 import Fan from "@/model/Fan";
-import fanService, { SocketData } from "@/services/fanService";
+import fanService, {
+  SocketData,
+  MODE_MANUAL,
+  MODE_PERFORMANCE,
+  MODE_SILENCE,
+  ControlMode
+} from "@/services/fanService";
 @Component({
   components: {
     FanList,
-    Slidebar
+    Slidebar,
+    ModeSwitch
   }
 })
 export default class Home extends Vue {
+  private controlMode: ControlMode | null = null;
   private fanList: Fan[] = [];
   private speed: number = 0;
+  private setModeLoading = false;
+  private setModeTemp: ControlMode | null = null;
   private setSpeedLoading = false;
   private setSpeedTemp: number | null = null;
+  get CONTROL_MODE() {
+    return { MODE_MANUAL, MODE_PERFORMANCE, MODE_SILENCE };
+  }
   created() {
     fanService.on("update", this.onStateUpdate);
     this.connect();
@@ -43,6 +58,25 @@ export default class Home extends Vue {
   }
   connect() {
     fanService.connect();
+  }
+  setMode(val: ControlMode): Promise<any> {
+    if (this.setModeLoading) {
+      this.setModeTemp = val;
+      return Promise.resolve();
+    }
+    this.setModeLoading = true;
+    return fanService
+      .setMode(val)
+      .finally(() => {
+        this.setModeLoading = false;
+      })
+      .then(() => {
+        if (this.setModeTemp !== null) {
+          const temp = this.setModeTemp;
+          this.setModeTemp = null;
+          return this.setMode(temp);
+        }
+      });
   }
   setSpeed(val: number): Promise<any> {
     if (this.setSpeedLoading) {

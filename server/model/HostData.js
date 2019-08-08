@@ -33,6 +33,22 @@ class HostData {
     return this;
   }
 
+  max(data = {}) {
+    if (data.cpuTemp > 0) {
+      this.cpuTemp = Math.max(this.cpuTemp || 0, data.cpuTemp);
+    }
+    if (data.gpuTemp > 0) {
+      this.gpuTemp = Math.max(this.gpuTemp || 0, data.gpuTemp);
+    }
+    if (data.cpuLoad > 0) {
+      this.cpuLoad = Math.max(this.cpuLoad || 0, data.cpuLoad);
+    }
+    if (data.gpuLoad > 0) {
+      this.gpuLoad = Math.max(this.gpuLoad || 0, data.gpuLoad);
+    }
+    return this;
+  }
+
   avg() {
     if (this.count > 1) {
       if (this.cpuTemp > 0) {

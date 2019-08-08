@@ -32,5 +32,9 @@ class Fan {
   set pwm(val) {
     this._pwm = val;
   }
+
+  get load() {
+    return (this._pwm && this._pwm.percent) || 0;
+  }
 }
 module.exports = Fan;

@@ -4,11 +4,16 @@ import EventEmitter from "eventemitter3";
 import Fan from "@/model/Fan";
 import Host from "@/model/Host";
 
-export declare class SocketData {
-  type: string;
-  speed?: number;
-  fanList?: Fan[];
-  hostList?: Host[];
+declare namespace FanServiceTypes {
+  type MessageType = "state" | "speed" | "mode";
+  type ControlMode = 0 | 1 | 2;
+  type SocketData = {
+    type: MessageType;
+    mode: ControlMode;
+    speed?: number;
+    fanList?: Fan[];
+    hostList?: Host[];
+  };
 }
 class FanService extends EventEmitter {
   private axios: AxiosInstance;
@@ -19,18 +24,32 @@ class FanService extends EventEmitter {
       baseURL: "/api"
     });
   }
+  setMode(mode: ControlMode): Promise<any> {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      return Promise.resolve().then(() => {
+        this.socket.send(
+          JSON.stringify({
+            type: "mode",
+            mode
+          })
+        );
+      });
+    } else {
+      return this.axios.post("/mode", { mode });
+    }
+  }
   setSpeed(percent: number): Promise<any> {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       return Promise.resolve().then(() => {
         this.socket.send(
           JSON.stringify({
             type: "speed",
-            speed: percent
+            percent
           })
         );
       });
     } else {
-      return this.axios.post("/speed", { speed: percent });
+      return this.axios.post("/speed", { percent });
     }
   }
   connect(): Promise<any> {
@@ -55,7 +74,7 @@ class FanService extends EventEmitter {
   }
   private onSocketMessage(e: MessageEvent) {
     try {
-      const data = <SocketData>JSON.parse(e.data);
+      const data = <FanServiceTypes.SocketData>JSON.parse(e.data);
       this.emit("update", data);
     } catch (err) {
       console.warn("invalid message", err);
@@ -63,3 +82,9 @@ class FanService extends EventEmitter {
   }
 }
 export default new FanService();
+export const MODE_MANUAL: ControlMode = 0;
+export const MODE_PERFORMANCE: ControlMode = 1;
+export const MODE_SILENCE: ControlMode = 2;
+export type MessageType = FanServiceTypes.MessageType;
+export type ControlMode = FanServiceTypes.ControlMode;
+export type SocketData = FanServiceTypes.SocketData;
