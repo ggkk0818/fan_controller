@@ -46,7 +46,10 @@ export default class ModeSwitch extends Vue {
 }
 </script>
 <style lang="scss" scoped>
-.slidebar-wrapper {
+.mode-switch-wrapper {
   margin: 20px auto;
+  .btn {
+    min-width: 120px;
+  }
 }
 </style>

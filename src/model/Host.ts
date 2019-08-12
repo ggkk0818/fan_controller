@@ -22,7 +22,7 @@ declare namespace Host {
   }
 }
 export default Host.Host;
-export type OFF_LINE = Host.OFF_LINE;
-export type ON_LINE = Host.ON_LINE;
+export const OFF_LINE = 0;
+export const ON_LINE = 1;
 export type HostState = Host.HostState;
 export type HostData = Host.HostData;

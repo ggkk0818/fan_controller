@@ -3,7 +3,14 @@
     <div class="fan" v-for="item of fanList" :key="item.id">
       <img ref="fan" :src="fanImg" />
       <p class="text text-muted">
-        {{ item.rpm }}rpm<br />{{ item.load | toPercent }}%
+        {{ item.rpm }}rpm<br />
+        <count-to
+          :start-val="0"
+          :end-val="item.load | toPercent"
+          :duration="800"
+          :decimals="0"
+          suffix="%"
+        />
       </p>
     </div>
   </div>
@@ -11,6 +18,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import countTo from "vue-count-to";
 import fanImg from "@/assets/fan.png";
 import { TweenLite, TimelineMax, Power0 } from "gsap";
 import Fan from "@/model/Fan";
@@ -22,6 +30,9 @@ declare type AnimateHolder = {
 };
 
 @Component({
+  components: {
+    countTo
+  },
   filters: {
     toPercent(val: number): string {
       return (val * 100).toFixed(0);

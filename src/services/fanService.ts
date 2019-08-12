@@ -3,6 +3,7 @@ import { AxiosInstance } from "axios";
 import EventEmitter from "eventemitter3";
 import Fan from "@/model/Fan";
 import Host from "@/model/Host";
+const RECONNECT_INTERVAL = 5000;
 
 declare namespace FanServiceTypes {
   type MessageType = "state" | "speed" | "mode";
@@ -18,6 +19,13 @@ declare namespace FanServiceTypes {
 class FanService extends EventEmitter {
   private axios: AxiosInstance;
   private socket!: WebSocket;
+  private reconnect: boolean = true;
+  get autoReconnect() {
+    return this.reconnect;
+  }
+  set autoReconnect(val) {
+    this.reconnect = val;
+  }
   constructor() {
     super();
     this.axios = axiosFactory.getInstance({
@@ -69,6 +77,13 @@ class FanService extends EventEmitter {
       this.socket.onerror = e => {
         reject(e);
         this.emit("error", e);
+      };
+      this.socket.onclose = e => {
+        if (this.reconnect) {
+          setTimeout(() => {
+            this.connect();
+          }, RECONNECT_INTERVAL);
+        }
       };
     });
   }
