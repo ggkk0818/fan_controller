@@ -46,18 +46,18 @@ class FanService extends EventEmitter {
       return this.axios.post("/mode", { mode });
     }
   }
-  setSpeed(percent: number): Promise<any> {
+  setSpeed(speed: number): Promise<any> {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       return Promise.resolve().then(() => {
         this.socket.send(
           JSON.stringify({
             type: "speed",
-            percent
+            speed
           })
         );
       });
     } else {
-      return this.axios.post("/speed", { percent });
+      return this.axios.post("/speed", { speed });
     }
   }
   connect(): Promise<any> {

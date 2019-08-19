@@ -9,7 +9,6 @@
 </template>
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-import "vue-slider-component/theme/default.css";
 import Host, { HostState, OFF_LINE, ON_LINE } from "@/model/Host";
 
 @Component

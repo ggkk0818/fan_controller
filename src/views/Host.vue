@@ -4,6 +4,15 @@
       <template slot="index" slot-scope="data">
         {{ data.index + 1 }}
       </template>
+      <template slot="name" slot-scope="data">
+        {{ data.item.name
+        }}<b-badge variant="primary" v-if="data.item.isCurrent">me</b-badge>
+      </template>
+      <template slot="cmdList" slot-scope="data">
+        <b-badge variant="info" v-for="cmd of data.item.cmdList" :key="cmd">{{
+          cmd
+        }}</b-badge>
+      </template>
       <template slot="hostData" slot-scope="data">
         <template v-if="data.hostData">
           CPU:{{ data.hostData.cpuTemp }}&#8451;<br />
@@ -47,3 +56,9 @@ export default class HostPage extends Vue {
   }
 }
 </script>
+<style lang="scss" scoped>
+.badge {
+  margin: 0 5px;
+  vertical-align: text-bottom;
+}
+</style>

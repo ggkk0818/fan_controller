@@ -55,6 +55,9 @@ export default class Home extends Vue {
     if (typeof data.speed === "number") {
       this.updateSpeed(data.speed);
     }
+    if (typeof data.mode === "number") {
+      this.updateMode(data.mode);
+    }
   }
   connect() {
     fanService.connect();
@@ -96,6 +99,9 @@ export default class Home extends Vue {
           return this.setSpeed(temp);
         }
       });
+  }
+  updateMode(mode: ControlMode) {
+    this.controlMode = mode;
   }
   updateSpeed(speed: number) {
     this.speed = speed;

@@ -1,28 +1,22 @@
-declare namespace Host {
-  type OFF_LINE = 0;
-  type ON_LINE = 1;
-  type HostState = OFF_LINE | ON_LINE;
-  class HostData {
-    time?: number;
-    cpuTemp?: number;
-    gpuTemp?: number;
-    cpuLoad?: number;
-    gpuLoad?: number;
-    count?: number;
-  }
-  class Host {
-    id: string;
-    name: string;
-    ip: string;
-    cmdList?: string[];
-    hostData?: HostData;
-    avgData?: HostData;
-    state?: HostState;
-    isCurrent?: boolean;
-  }
-}
-export default Host.Host;
 export const OFF_LINE = 0;
 export const ON_LINE = 1;
-export type HostState = Host.HostState;
-export type HostData = Host.HostData;
+export type HostState = 0 | 1;
+export interface HostData {
+  time?: number;
+  cpuTemp?: number;
+  gpuTemp?: number;
+  cpuLoad?: number;
+  gpuLoad?: number;
+  count?: number;
+}
+export interface Host {
+  id: string;
+  name: string;
+  ip: string;
+  cmdList?: string[];
+  hostData?: HostData;
+  avgData?: HostData;
+  state?: HostState;
+  isCurrent?: boolean;
+}
+export default Host;

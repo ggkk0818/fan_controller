@@ -3,14 +3,14 @@
     <div class="fan" v-for="item of fanList" :key="item.id">
       <img ref="fan" :src="fanImg" />
       <p class="text text-muted">
-        {{ item.rpm }}rpm<br />
-        <count-to
+        {{ item.rpm }}rpm<br />{{ item.load | toPercent }}%
+        <!-- <count-to
           :start-val="0"
-          :end-val="item.load | toPercent"
-          :duration="800"
+          :end-val="item.load * 100"
+          :duration="300"
           :decimals="0"
           suffix="%"
-        />
+        /> -->
       </p>
     </div>
   </div>

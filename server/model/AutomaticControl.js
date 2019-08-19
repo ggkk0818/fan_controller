@@ -47,6 +47,7 @@ class AutomaticControl extends EventEmitter {
       : [];
   }
   set speed(val = MIN_SPEED) {
+    console.log("controller set speed");
     this._setSpeed(val);
     if (this._mode !== CONTROL_MODE.MANUAL) {
       this._manualExpireTime = Date.now() + MANUAL_HOLD_TIMEOUT;
@@ -95,8 +96,7 @@ class AutomaticControl extends EventEmitter {
   _calcSpeed() {
     if (
       this.mode === CONTROL_MODE.MANUAL ||
-      (this._manualExpireTime &&
-        Date.now() - this._manualExpireTime < MANUAL_HOLD_TIMEOUT)
+      (this._manualExpireTime && Date.now() < this._manualExpireTime)
     ) {
       return;
     }
@@ -135,7 +135,7 @@ class AutomaticControl extends EventEmitter {
       // back to auto mode when timeout, adjust 10% per second
       let duration = 10000;
       let currentSpeed = Math.max(0, ...this.speed) || 0;
-      let step = (speed - currentSpeed) / (duration / TIMER_INTERVAL);
+      let step = (speed - currentSpeed) / 10;
       this._setSpeed(currentSpeed + step);
       if (Date.now() - this._manualExpireTime > duration) {
         this._manualExpireTime = null;
