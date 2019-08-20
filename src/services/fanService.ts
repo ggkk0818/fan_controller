@@ -2,7 +2,7 @@ import axiosFactory from "@/utils/axiosFactory";
 import { AxiosInstance } from "axios";
 import EventEmitter from "eventemitter3";
 import Fan from "@/model/Fan";
-import Host from "@/model/Host";
+import Host, { HostData } from "@/model/Host";
 const RECONNECT_INTERVAL = 5000;
 
 declare namespace FanServiceTypes {
@@ -31,6 +31,7 @@ class FanService extends EventEmitter {
     this.axios = axiosFactory.getInstance({
       baseURL: "/api"
     });
+    window.addEventListener("temperature", this.onAgentMessage.bind(this));
   }
   setMode(mode: ControlMode): Promise<any> {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
@@ -93,6 +94,20 @@ class FanService extends EventEmitter {
       this.emit("update", data);
     } catch (err) {
       console.warn("invalid message", err);
+    }
+  }
+  private onAgentMessage(e: Event) {
+    console.log(e);
+    const data = (<any>window).agentData;
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(
+        JSON.stringify({
+          type: "state",
+          ...data
+        })
+      );
+    } else {
+      return this.axios.post("/state", data);
     }
   }
 }

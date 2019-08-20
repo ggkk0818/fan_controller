@@ -84,6 +84,7 @@ class Manager extends EventEmitter {
       host.addCMD(cmd);
     }
     if (data) {
+      data.time = Date.now();
       host.addData(data);
     }
     this.emit("update_host", host);

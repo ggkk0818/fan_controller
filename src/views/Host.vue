@@ -14,9 +14,9 @@
         }}</b-badge>
       </template>
       <template slot="hostData" slot-scope="data">
-        <template v-if="data.hostData">
-          CPU:{{ data.hostData.cpuTemp }}&#8451;<br />
-          GPU:{{ data.hostData.gpuTemp }}&#8451;
+        <template v-if="data.item.hostData">
+          CPU:{{ data.item.hostData.cpuTemp }}&#8451;<br />
+          GPU:{{ data.item.hostData.gpuTemp }}&#8451;
         </template>
         <template v-else>
           N/A
@@ -49,7 +49,9 @@ export default class HostPage extends Vue {
     this.connect();
   }
   onStateUpdate(data: SocketData) {
-    this.hostList = data.hostList || [];
+    if (data.hostList) {
+      this.hostList = data.hostList;
+    }
   }
   connect() {
     fanService.connect();
