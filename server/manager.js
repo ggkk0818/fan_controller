@@ -23,9 +23,12 @@ class Manager extends EventEmitter {
   _init() {
     this.pwm = new PWM(18);
     let fan1 = new Fan();
-    fan1.rpmReader = new RPMReader(27);
+    fan1.rpmReader = new RPMReader(23);
     fan1.pwm = this.pwm;
-    this.fanList.push(fan1);
+    let fan2 = new Fan();
+    fan2.rpmReader = new RPMReader(22);
+    fan2.pwm = this.pwm;
+    this.fanList.push(fan1, fan2);
     this.controller = new AutomaticControl();
     this.controller.fanList = this.fanList;
     this.controller.hostList = this.hostList;
@@ -84,7 +87,6 @@ class Manager extends EventEmitter {
       host.addCMD(cmd);
     }
     if (data) {
-      data.time = Date.now();
       host.addData(data);
     }
     this.emit("update_host", host);

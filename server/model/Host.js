@@ -86,7 +86,7 @@ class Host extends EventEmitter {
   }
 
   addData(data) {
-    let time = data.time;
+    let time = data.time || Date.now();
     if (this._endTime === null || time > this._endTime) {
       this._endTime = time;
     }

@@ -57,7 +57,7 @@ export default class FanList extends Vue {
       });
       this.timeline.splice(0, this.timeline.length);
     }
-    (<Array<HTMLBaseElement>>this.$refs.fan).forEach(item => {
+    (<Array<HTMLBaseElement>>this.$refs.fan).forEach((item, index) => {
       let t = new TimelineMax({ repeat: -1 });
       t.fromTo(
         item,
@@ -65,6 +65,7 @@ export default class FanList extends Vue {
         { rotation: 0 },
         { rotation: 360, ease: Power0.easeInOut }
       );
+      t.timeScale(getTimeScale(this.fanList[index].rpm));
       this.timeline.push(t);
     });
   }
@@ -78,7 +79,7 @@ export default class FanList extends Vue {
       percent: 1,
       onUpdate: function() {
         vm.fanList.forEach((item: Fan, index: number) => {
-          let scale = getTimeScale(item.load);
+          let scale = getTimeScale(item.rpm);
           let oldScale = vm.animateHolder.fromScale[index];
           let current = oldScale + (scale - oldScale) * this.ratio;
           vm.timeline[index].timeScale(current);
@@ -113,7 +114,7 @@ export default class FanList extends Vue {
 .fan-list {
   display: flex;
   width: 100%;
-  margin-bottom: 50px;
+  margin-bottom: 20px;
   align-items: flex-start;
   flex-direction: row;
   flex-flow: wrap;

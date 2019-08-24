@@ -61,6 +61,24 @@ class HostData {
     return this;
   }
 
+  min(data) {
+    if (data) {
+      if (data.cpuTemp > 0) {
+        this.cpuTemp = Math.min(this.cpuTemp || 0, data.cpuTemp);
+      }
+      if (data.gpuTemp > 0) {
+        this.gpuTemp = Math.min(this.gpuTemp || 0, data.gpuTemp);
+      }
+      if (data.cpuLoad > 0) {
+        this.cpuLoad = Math.min(this.cpuLoad || 0, data.cpuLoad);
+      }
+      if (data.gpuLoad > 0) {
+        this.gpuLoad = Math.min(this.gpuLoad || 0, data.gpuLoad);
+      }
+    }
+    return this;
+  }
+
   avg() {
     if (this.count > 1) {
       if (this.cpuTemp > 0) {

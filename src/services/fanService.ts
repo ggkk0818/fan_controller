@@ -73,11 +73,12 @@ class FanService extends EventEmitter {
       this.socket = new WebSocket(`ws://${location.host}/api/state`);
       this.socket.onmessage = e => this.onSocketMessage(e);
       this.socket.onopen = e => {
+        this.emit("connected", e);
         resolve(this.socket);
       };
       this.socket.onerror = e => {
-        reject(e);
         this.emit("error", e);
+        reject(e);
       };
       this.socket.onclose = e => {
         if (this.reconnect) {
@@ -85,6 +86,7 @@ class FanService extends EventEmitter {
             this.connect();
           }, RECONNECT_INTERVAL);
         }
+        this.emit("closed", e);
       };
     });
   }

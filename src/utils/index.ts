@@ -1,3 +1,3 @@
-export function getTimeScale(percent: number): number {
-  return 1 + percent * 2;
+export function getTimeScale(rpm: number): number {
+  return (rpm / 2000) * 3;
 }

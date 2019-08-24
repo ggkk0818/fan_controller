@@ -47,7 +47,6 @@ class AutomaticControl extends EventEmitter {
       : [];
   }
   set speed(val = MIN_SPEED) {
-    console.log("controller set speed");
     this._setSpeed(val);
     if (this._mode !== CONTROL_MODE.MANUAL) {
       this._manualExpireTime = Date.now() + MANUAL_HOLD_TIMEOUT;
@@ -103,11 +102,18 @@ class AutomaticControl extends EventEmitter {
     let speed = MIN_SPEED;
     if (this._hostList && this._hostList.length) {
       let data = new HostData();
+      let dataAvg = new HostData();
       this._hostList.forEach(item => {
         if (item.state === HOST_STATE.ON_LINE) {
-          data.max(item.hostData).max(item.avgData);
+          data.max(item.hostData);
+          dataAvg.max(item.avgData);
         }
       });
+      if (this._mode === CONTROL_MODE.PERFORMANCE) {
+        data.max(dataAvg);
+      } else {
+        data.min(dataAvg);
+      }
       let p = 0;
       if (data.cpuTemp > 0) {
         p = Math.max(
@@ -135,7 +141,7 @@ class AutomaticControl extends EventEmitter {
       // back to auto mode when timeout, adjust 10% per second
       let duration = 10000;
       let currentSpeed = Math.max(0, ...this.speed) || 0;
-      let step = (speed - currentSpeed) / 10;
+      let step = ((speed - currentSpeed) / (duration / TIMER_INTERVAL)) * 2;
       this._setSpeed(currentSpeed + step);
       if (Date.now() - this._manualExpireTime > duration) {
         this._manualExpireTime = null;

@@ -1,5 +1,6 @@
 const express = require("express");
 const expressWs = require("express-ws");
+const WebSocket = require("ws");
 const router = express.Router();
 const HOST_COMMAND = require("../consts/hostCommand");
 const manager = require("../manager");
@@ -47,6 +48,9 @@ router.ws("/state", function(ws, req) {
  */
 setInterval(() => {
   router.wsInstance.getWss("/api/state").clients.forEach(ws => {
+    if (ws.readyState !== WebSocket.OPEN) {
+      return;
+    }
     let host = manager.getHostByWs(ws);
     ws.send(
       JSON.stringify({
@@ -80,6 +84,9 @@ setInterval(() => {
  */
 manager.on("update_speed", speed => {
   router.wsInstance.getWss("/api/state").clients.forEach(ws => {
+    if (ws.readyState !== WebSocket.OPEN) {
+      return;
+    }
     ws.send(
       JSON.stringify({
         type: "speed",
@@ -90,6 +97,9 @@ manager.on("update_speed", speed => {
 });
 manager.on("update_mode", mode => {
   router.wsInstance.getWss("/api/state").clients.forEach(ws => {
+    if (ws.readyState !== WebSocket.OPEN) {
+      return;
+    }
     ws.send(
       JSON.stringify({
         type: "mode",
