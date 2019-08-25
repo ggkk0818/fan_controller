@@ -12,7 +12,7 @@ class Host extends EventEmitter {
     this._name = null;
     this._ip = null;
     this._cmdMap = {};
-    this._dataMap = {};
+    this._dataList = [];
     this._avgData = null;
     this._startTime = null;
     this._endTime = null;
@@ -45,7 +45,9 @@ class Host extends EventEmitter {
   }
 
   get hostData() {
-    return this._endTime ? this._dataMap[this._endTime] : null;
+    return this._dataList.length
+      ? this._dataList[this._dataList.length - 1]
+      : null;
   }
 
   get avgData() {
@@ -86,32 +88,32 @@ class Host extends EventEmitter {
   }
 
   addData(data) {
-    let time = data.time || Date.now();
-    if (this._endTime === null || time > this._endTime) {
-      this._endTime = time;
+    if (!data) {
+      return;
     }
-    if (this._startTime === null || time < this._startTime) {
-      this._startTime = time;
-    }
-    this._dataMap[time] = new HostData(data);
-    if (Object.keys(this._dataMap).length > MAX_DATA_COUNT) {
-      delete this._dataMap[this._startTime];
-      this._startTime = Math.min(Object.keys(this._dataMap));
+    data.time = data.time || Date.now();
+    this._dataList.push(new HostData(data));
+    if (this._dataList.length > MAX_DATA_COUNT) {
+      this._dataList.splice(0, this._dataList.length - MAX_DATA_COUNT);
     }
     this._isDirty = true;
   }
 
   calcAvgData() {
     let data = null;
-    let end = this._endTime;
-    let start = end - AVG_DURATION;
-    for (let time of Object.keys(this._dataMap)) {
-      if (time >= start && time <= end) {
-        let item = this._dataMap[time];
-        if (data) {
-          data.add(item);
+    if (this._dataList.length) {
+      let end = this._dataList[this._dataList.length - 1].time;
+      let start = end - AVG_DURATION;
+      for (let i = this._dataList.length - 1; i >= 0; i--) {
+        let item = this._dataList[i];
+        if (item.time >= start && item.time <= end) {
+          if (data) {
+            data.add(item);
+          } else {
+            data = item.clone();
+          }
         } else {
-          data = item.clone();
+          break;
         }
       }
     }
